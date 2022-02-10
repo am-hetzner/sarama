@@ -115,6 +115,7 @@ func (om *offsetManager) Close() error {
 		// flush one last time
 		if om.conf.Consumer.Offsets.AutoCommit.Enable {
 			for attempt := 0; attempt <= om.conf.Consumer.Offsets.Retry.Max; attempt++ {
+				Logger.Printf("!!! Flushing on close attempt II")
 				om.flushToBroker()
 				if om.releasePOMs(false) == 0 {
 					break
@@ -168,6 +169,7 @@ func (om *offsetManager) fetchInitialOffset(topic string, partition int32, retri
 
 	switch block.Err {
 	case ErrNoError:
+		Logger.Printf("!!! fetchInitialOffset: offset %d, consumergroup: %s", block.Offset, om.group)
 		return block.Offset, block.Metadata, nil
 	case ErrNotCoordinatorForConsumer:
 		if retries <= 0 {
@@ -243,6 +245,7 @@ func (om *offsetManager) mainLoop() {
 }
 
 func (om *offsetManager) Commit() {
+	Logger.Printf("!!! Flushing on commit")
 	om.flushToBroker()
 	om.releasePOMs(false)
 }
